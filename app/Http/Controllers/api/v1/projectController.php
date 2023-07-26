@@ -9,23 +9,75 @@ use Illuminate\Http\Request;
 
 class projectController extends Controller
 {
-    public function index(){
-        return Project::all();
+    public function index()
+    {
+        try {
+        $out = new \Symfony\Component\Console\Output\ConsoleOutput();
+
+        $projects = Project::all();
+        $projectsFinal = array();
+        foreach ($projects as $project) {
+            $project::with(['users_liked'])->get();
+            // echo($project::with(['users_liked'])->get());
+            $projectsFinal = $project::with(['users_liked'])->get();
+        }
+        // $projects = $projects::with(['users_liked'])->get();
+        return $projectsFinal;
+        } catch (\Throwable $th) {
+        //throw $th;
+        dd($th);
+        }
     }
 
-    public function show(Project $project){
+    public function show(Project $project)
+    {
         return $project;
     }
-    public function store(StoreProjectRequest $request){
+    public function store(StoreProjectRequest $request)
+    {
         Project::create($request->validated());
         return response()->json("Project Created");
     }
-    public function update(StoreProjectRequest $request, Project $project){
+    public function update(StoreProjectRequest $request, Project $project)
+    {
         $project->update($request->validated());
-        return response()->json("Project Updated");
+        return $project;
     }
-     public function destroy( Project $project){
+    public function destroy(Project $project)
+    {
         $project->delete();
         return response()->json("Project Deleted");
     }
+    public function like($id, Request $request){
+    try {
+        $project = Project::find($id);
+        if ($project) {
+            $userLikedProject = $project->users_liked()->where('user_id', $request->user_id)->exists();
+            // dd($userLikedProject);
+
+            if ($userLikedProject) {
+                $project->users_liked()->detach($request->user_id);
+            } else {
+                $project->users_liked()->attach($request->user_id);
+            }
+        }
+        return response()->json("");
+    } catch (\Throwable $th) {
+        //throw $th;
+       dd($th);
+    }}
+
+     public function view($id){
+    try {
+        $out = new \Symfony\Component\Console\Output\ConsoleOutput();
+        $project = Project::find($id);
+        Project::where('id', $id)->update(array('view' => $project->view + 1));
+
+        return response()->json("");
+    } catch (\Throwable $th) {
+        //throw $th;
+       dd($th);
+    }}
+
+
 }

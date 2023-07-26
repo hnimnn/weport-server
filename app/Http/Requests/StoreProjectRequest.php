@@ -25,9 +25,8 @@ class StoreProjectRequest extends FormRequest
             'name' => ['required', 'min:3', 'max:50'],
             'thumbnail' => ['required'],
             'user_id' =>  ['required'],
-            'description' => 'nullable',
-            'tags' => 'nullable'
-
+            'description' => 'nullab    le',
+            'tags' => 'nullable',
         ];
     }
 }

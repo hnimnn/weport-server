@@ -13,11 +13,11 @@ return new class extends Migration
     {
         Schema::table('users-saved', function (Blueprint $table) {
         $table->integer('project_id');
-        $table->dateTime('saved_at');
+        $table->string('saved_at')->nullable();
         });
         Schema::table('users-liked', function (Blueprint $table) {
         $table->integer('project_id');
-        $table->dateTime('liked_at');
+        $table->string('liked_at')->nullable();
         });
     }
 
