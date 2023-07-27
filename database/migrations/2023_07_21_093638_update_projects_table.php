@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::table('projects', function (Blueprint $table) {
             $table->integer('user_id');
-        $table->string('thumbnail');
-        $table->string('tags')->nullable();
-        $table->string('description', 750)->nullable();
-        $table->integer('view')->default(0);
+            $table->string('thumbnail', 750);
+            $table->string('tags')->nullable();
+            $table->string('description', 750)->nullable();
+            $table->integer('view')->default(0);
         });
     }
 
@@ -25,6 +25,13 @@ return new class extends Migration
      */
     public function down(): void
     {
-         Schema::dropIfExists('projects');
+           Schema::table('projects', function (Blueprint $table) {
+            $table->dropColumn('user_id');
+            $table->dropColumn('thumbnail');
+            $table->dropColumn('tags');
+            $table->dropColumn('description');
+            $table->dropColumn('view');
+        });
+
     }
 };

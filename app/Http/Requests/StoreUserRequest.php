@@ -4,14 +4,14 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreProjectRequest extends FormRequest
+class StoreUserRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return true;
+        return false;
     }
 
     /**
@@ -21,12 +21,12 @@ class StoreProjectRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
+         return [
             'name' => ['required', 'min:3', 'max:50'],
-            'thumbnail' => ['required'],
-            'user_id' =>  ['required'],
-            'description' => 'nullable',
-            'tags' => 'nullable',
+            'email' =>  ['required'],
+            'password' => ['required', 'min:8'],
+            'phone' => 'nullable',
+            'role' => 'nullable',
         ];
     }
 }

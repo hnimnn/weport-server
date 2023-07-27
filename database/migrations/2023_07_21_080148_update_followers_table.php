@@ -25,6 +25,13 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('followers');
+        Schema::table('followers', function (Blueprint $table) {
+            $table->dropColumn('user_id');
+            $table->dropColumn('follower_id');
+            $table->dropColumn('followed_at');
+            $table->integer('id');
+            $table->timestamps();
+
+        });
     }
 };

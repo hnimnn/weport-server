@@ -23,6 +23,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('tags');
+       Schema::table('tags', function (Blueprint $table) {
+            $table->dropColumn('tag_name');
+            $table->dropColumn('project_id');
+            $table->timestamps();
+        });
     }
 };

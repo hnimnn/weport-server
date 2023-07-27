@@ -26,7 +26,14 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('users-saved');
-        Schema::dropIfExists('users-liked');
+        Schema::table('users-saved', function (Blueprint $table) {
+            $table->dropColumn('project_id');
+            $table->dropColumn('saved_at');
+        });
+
+        Schema::table('users-liked', function (Blueprint $table) {
+            $table->dropColumn('project_id');
+            $table->dropColumn('liked_at');
+        });
     }
 };

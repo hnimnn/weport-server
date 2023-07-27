@@ -7,21 +7,17 @@ use App\Http\Requests\StoreProjectRequest;
 use App\Models\Project;
 use Illuminate\Http\Request;
 
-class projectController extends Controller
+class ProjectController extends Controller
 {
     public function index()
     {
         try {
-        $out = new \Symfony\Component\Console\Output\ConsoleOutput();
 
         $projects = Project::all();
         $projectsFinal = array();
         foreach ($projects as $project) {
-            $project::with(['users_liked'])->get();
-            // echo($project::with(['users_liked'])->get());
             $projectsFinal = $project::with(['users_liked'])->get();
         }
-        // $projects = $projects::with(['users_liked'])->get();
         return $projectsFinal;
         } catch (\Throwable $th) {
         //throw $th;
@@ -53,7 +49,6 @@ class projectController extends Controller
         $project = Project::find($id);
         if ($project) {
             $userLikedProject = $project->users_liked()->where('user_id', $request->user_id)->exists();
-            // dd($userLikedProject);
 
             if ($userLikedProject) {
                 $project->users_liked()->detach($request->user_id);
@@ -67,7 +62,7 @@ class projectController extends Controller
        dd($th);
     }}
 
-     public function view($id){
+    public function view($id){
     try {
         $out = new \Symfony\Component\Console\Output\ConsoleOutput();
         $project = Project::find($id);
@@ -78,6 +73,13 @@ class projectController extends Controller
         //throw $th;
        dd($th);
     }}
+    public function getProjectByUserId(){
+    try {
 
+        return Project::all();
+    } catch (\Throwable $th) {
+        //throw $th;
+       dd($th);
+    }}
 
 }
