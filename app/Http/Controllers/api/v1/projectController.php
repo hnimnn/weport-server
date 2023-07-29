@@ -5,7 +5,9 @@ namespace App\Http\Controllers\api\v1;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreProjectRequest;
 use App\Models\Project;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ProjectController extends Controller
 {
@@ -13,21 +15,27 @@ class ProjectController extends Controller
     {
         try {
 
-        $projects = Project::all();
-        $projectsFinal = array();
-        foreach ($projects as $project) {
-            $projectsFinal = $project::with(['users_liked'])->get();
-        }
-        return $projectsFinal;
+            $projects = Project::all();
+            $projectsFinal = array();
+            foreach ($projects as $project) {
+                $projectsFinal = $project::with(['user'])->with(['users_liked'])->get();
+            }
+
+            return $projectsFinal;
         } catch (\Throwable $th) {
-        //throw $th;
-        dd($th);
+            //throw $th;
+            dd($th);
         }
     }
 
-    public function show(Project $project)
+    public function show($id)
     {
-        return $project;
+        try {
+            return   Project::where('id', $id)->with('users_liked')->first();
+
+        } catch (\Throwable $th) {
+            dd($th);
+        }
     }
     public function store(StoreProjectRequest $request)
     {
@@ -44,42 +52,38 @@ class ProjectController extends Controller
         $project->delete();
         return response()->json("Project Deleted");
     }
-    public function like($id, Request $request){
-    try {
-        $project = Project::find($id);
-        if ($project) {
-            $userLikedProject = $project->users_liked()->where('user_id', $request->user_id)->exists();
+    public function like($id, Request $request)
+    {
+        try {
+            $project = Project::find($id);
+            $currentUser = Auth::user();
+            if ($project) {
+                $userLikedProject = $project->users_liked()->where('user_id', $currentUser->id)->exists();
 
-            if ($userLikedProject) {
-                $project->users_liked()->detach($request->user_id);
-            } else {
-                $project->users_liked()->attach($request->user_id);
+                if ($userLikedProject) {
+                    $project->users_liked()->detach($currentUser->id);
+                } else {
+                    $project->users_liked()->attach($currentUser->id);
+                }
             }
+            return response()->json("");
+        } catch (\Throwable $th) {
+            //throw $th;
+            dd($th);
         }
-        return response()->json("");
-    } catch (\Throwable $th) {
-        //throw $th;
-       dd($th);
-    }}
+    }
 
-    public function view($id){
-    try {
-        $out = new \Symfony\Component\Console\Output\ConsoleOutput();
-        $project = Project::find($id);
-        Project::where('id', $id)->update(array('view' => $project->view + 1));
+    public function view($id)
+    {
+        try {
+            $out = new \Symfony\Component\Console\Output\ConsoleOutput();
+            $project = Project::find($id);
+            Project::where('id', $id)->update(array('view' => $project->view + 1));
 
-        return response()->json("");
-    } catch (\Throwable $th) {
-        //throw $th;
-       dd($th);
-    }}
-    public function getProjectByUserId(){
-    try {
-
-        return Project::all();
-    } catch (\Throwable $th) {
-        //throw $th;
-       dd($th);
-    }}
-
+            return response()->json("");
+        } catch (\Throwable $th) {
+            //throw $th;
+            dd($th);
+        }
+    }
 }

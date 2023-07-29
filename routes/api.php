@@ -6,26 +6,40 @@ use App\Http\Controllers\api\v1\AuthController;
 use Illuminate\Support\Facades\Route;
 
 
-//----Auth
-Route::post(
-    '/v1/register',
-    [AuthController::class, 'register']
-);
-//----User
-Route::get(
-    '/v1/user/projects',
-    [UserController::class, 'myProject']
-);
+Route::group([
+    'middleware' => 'api',
+    'prefix' => 'auth'
 
-//----Project
-Route::group(['prefix' => 'v1'], function() {
-    Route::apiResource('projects', ProjectController::class);
+], function ($router){
+//----Auth
+    Route::post(
+        '/v1/register',
+        [AuthController::class, 'register']
+    );
+    Route::post(
+        '/v1/login',
+        [AuthController::class, 'login']
+    );
+    Route::post(
+        '/v1/logout',
+        [AuthController::class, 'logout']
+    );
+    //----User
+    Route::get(
+        '/v1/user/projects',
+        [UserController::class, 'myProject']
+    );
+
+    //----Project
+    Route::group(['prefix' => 'v1'], function() {
+        Route::apiResource('projects', ProjectController::class);
+    });
+    Route::post(
+        '/v1/projects/{id}/like',
+        [ProjectController::class, 'like']
+    );
+    Route::post(
+        '/v1/projects/{id}/view',
+        [ProjectController::class, 'view']
+    );
 });
-Route::post(
-    '/v1/projects/{id}/like',
-    [ProjectController::class, 'like']
-);
-Route::post(
-    '/v1/projects/{id}/view',
-    [ProjectController::class, 'view']
-);
