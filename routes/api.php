@@ -39,6 +39,14 @@ Route::group([
         [ProjectController::class, 'like']
     );
     Route::post(
+        '/v1/projects/{id}/save',
+        [ProjectController::class, 'save']
+    );
+     Route::post(
+        '/v1/projects/{id}/buy',
+        [ProjectController::class, 'buy']
+    );
+    Route::post(
         '/v1/projects/{id}/view',
         [ProjectController::class, 'view']
     );
