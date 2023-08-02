@@ -10,8 +10,8 @@ Route::group([
     'middleware' => 'api',
     'prefix' => 'auth'
 
-], function ($router){
-//----Auth
+], function ($router) {
+    //----Auth
     Route::post(
         '/v1/register',
         [AuthController::class, 'register']
@@ -31,23 +31,38 @@ Route::group([
     );
 
     //----Project
-    Route::group(['prefix' => 'v1'], function() {
+    Route::group(['prefix' => 'v1'], function () {
         Route::apiResource('projects', ProjectController::class);
-    });
     Route::post(
-        '/v1/projects/{id}/like',
+        '/projects/{id}/like',
         [ProjectController::class, 'like']
     );
     Route::post(
-        '/v1/projects/{id}/save',
+        '/projects/{id}/save',
         [ProjectController::class, 'save']
     );
-     Route::post(
-        '/v1/projects/{id}/buy',
+    Route::post(
+        '/projects/{id}/buy',
         [ProjectController::class, 'buy']
     );
     Route::post(
-        '/v1/projects/{id}/view',
+        '/projects/{id}/view',
         [ProjectController::class, 'view']
     );
+
+    Route::group([
+        'middleware' => 'checkAdmin',
+        'prefix' => 'admin',
+    ], function ($router) {
+        Route::get(
+            '/projects/all',
+            [ProjectController::class, 'allProjects']
+        );
+        Route::post(
+            '/projects/{id}/approve',
+            [ProjectController::class, 'approve']
+        );
+    });
+    });
+
 });

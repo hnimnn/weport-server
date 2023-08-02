@@ -5,11 +5,12 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Session\TokenMismatchException;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
-class CheckAccessToken
+class CheckAdmin
 {
     /**
      * Handle an incoming request.
@@ -19,8 +20,13 @@ class CheckAccessToken
     public function handle(Request $request, Closure $next): Response
     {
         try {
+            // echo($request->bearerToken());
+            $user = Auth::user();
+            if ($user->role === 1) {
 
-            return $next($request);
+                return $next($request);
+            }
+            return response()->json("Error", 403);
 
         } catch (\Throwable $th) {
             dd($th);

@@ -9,9 +9,15 @@ use App\Models\User;
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 class ProjectController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->middleware('auth:api', ['except' => ['index', 'show', 'view']]);
+    }
     public function index()
     {
         try {
@@ -19,7 +25,7 @@ class ProjectController extends Controller
             $projects = Project::all();
             $projectsFinal = array();
             foreach ($projects as $project) {
-                $projectsFinal = $project::with(['user'])->with(['users_liked'])->with('users_saved')->get();
+                $projectsFinal = $project::with(['user'])->with(['users_liked'])->with('users_saved')->where('status', 'published')->get();
             }
 
             return $projectsFinal;
@@ -55,11 +61,38 @@ class ProjectController extends Controller
     }
     public function update(StoreProjectRequest $request, Project $project)
     {
-        $project->update($request->validated());
+        if ($request->thumbnail) {
+            $fileURL = Cloudinary::upload($request->file('thumbnail')->getRealPath())->getSecurePath();
+            $urlParts = explode("/", $project->thumbnail);
+            $imageNameWithExtension = end($urlParts);
+
+            $imageParts = explode(".", $imageNameWithExtension);
+
+            $imageNameWithoutExtension = $imageParts[0];
+            if ($imageNameWithoutExtension) {
+                Cloudinary::destroy($imageNameWithoutExtension);
+            }
+            $project->update($request->validated());
+
+            $request->request->add(['thumbnail' => $fileURL]);
+            $project->thumbnail = $fileURL;
+            $project->save();
+        }
+
         return $project;
     }
     public function destroy(Project $project)
     {
+
+        $urlParts = explode("/", $project->thumbnail);
+        $imageNameWithExtension = end($urlParts);
+
+        $imageParts = explode(".", $imageNameWithExtension);
+
+        $imageNameWithoutExtension = $imageParts[0];
+        if ($imageNameWithoutExtension) {
+            Cloudinary::destroy($imageNameWithoutExtension);
+        }
         $project->delete();
         return response()->json("Project Deleted");
     }
@@ -112,7 +145,6 @@ class ProjectController extends Controller
             $currentUser = Auth::user();
             $userBuy = User::find($currentUser->id);
             $userSell = User::find($project->user_id);
-            echo ($userSell);
             if (is_null($project->user_bought) &&  $project->user_id !== $currentUser->id) {
                 if ($currentUser->cash >= $project->price) {
                     $project->user_bought = $currentUser->id;
@@ -121,7 +153,15 @@ class ProjectController extends Controller
                     $userBuy->save();
                     $userSell->cash = $userSell->cash + $project->price * 85 / 100;
                     $userSell->save();
-
+                    $data = array(
+                        'name' => $userBuy->name,
+                        'email' => $userBuy->email,
+                        'project_name' => $project->name,
+                    );
+                    Mail::send(['html' => 'mail'], $data, function ($message) use ($userBuy) {
+                        $message->to($userBuy->email, $userBuy->name)->subject('Here your source');
+                        $message->from('WEport@gmail.com', 'WEport');
+                    });
                     return response()->json("Bought");
                 } else return response()->json("Not enough cash to pay", 401);
             }
@@ -133,6 +173,7 @@ class ProjectController extends Controller
     }
 
 
+
     public function view($id)
     {
         try {
@@ -141,6 +182,37 @@ class ProjectController extends Controller
             Project::where('id', $id)->update(array('view' => $project->view + 1));
 
             return response()->json("");
+        } catch (\Throwable $th) {
+            //throw $th;
+            dd($th);
+        }
+    }
+
+    //Admin --------------------
+    public function allProjects()
+    {
+        try {
+
+            $projects = Project::all();
+            $projectsFinal = array();
+            foreach ($projects as $project) {
+                $projectsFinal = $project::with(['user'])->with(['users_liked'])->with('users_saved')->get();
+            }
+
+            return $projectsFinal;
+        } catch (\Throwable $th) {
+            //throw $th;
+            dd($th);
+        }
+    }
+
+    public function approve($id, Request $request)
+    {
+        try {
+            // $project = Project::find($id);
+            Project::where('id', $id)->update(array('status' => $request->status));
+
+            return response()->json("Finish");
         } catch (\Throwable $th) {
             //throw $th;
             dd($th);

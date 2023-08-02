@@ -11,12 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        {
-            Schema::table('users', function (Blueprint $table) {
-                  $table->double('cash', 10, 2);;
-
-            });
-        }
+        Schema::table('projects', function (Blueprint $table) {
+            $table->string('status')->default('wait');
+        });
     }
 
     /**
@@ -24,11 +21,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        {
-            Schema::table('users', function (Blueprint $table) {
-                $table->dropColumn('cash');
+        Schema::table('projects', function (Blueprint $table) {
+            $table->dropColumn('status');
 
-            });
-        }
+        });
     }
 };
