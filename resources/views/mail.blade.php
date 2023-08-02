@@ -41,19 +41,19 @@
                                 </tr>
                                 <tr>
                                     <td style="padding:0 35px;">
-                                        <h1 style="color:#1e1e2d; font-weight:500; margin:0;font-size:32px;font-family:'Rubik',sans-serif;"> {{$project_name}}                                        </h1>
-                                        <p style="font-size:15px; color:#455056; margin:8px 0 0; line-height:24px;">You bought {{$project_name}}.</p>
+                                        <h1 style="color:#1e1e2d; font-weight:500; margin:0;font-size:32px;font-family:'Rubik',sans-serif;"> Payment Sucess!  </h1>
+                                        <p style="font-size:15px; color:#455056; margin:8px 0 0; line-height:24px;">Hi {{$name}}! You have successfully paid for the project in WEport.</p>
                                         <span
                                             style="display:inline-block; vertical-align:middle; margin:29px 0 26px; border-bottom:1px solid #cecece; width:100px;"></span>
                                         <p
                                             style="color:#455056; font-size:18px;line-height:20px; margin:0; font-weight: 500;">
                                             <strong
-                                                style="display: block;font-size: 13px; margin: 0 0 4px; color:rgba(0,0,0,.64); font-weight:normal;">Name</strong>{{$name}}
+                                                style="display: block;font-size: 13px; margin: 0 0 4px; color:rgba(0,0,0,.64); font-weight:normal;">Project Name</strong>{{$project_name}}
                                             <strong
-                                                style="display: block; font-size: 13px; margin: 24px 0 4px 0; font-weight:normal; color:rgba(0,0,0,.64);">Email</strong>{{$email}}
+                                                style="display: block; font-size: 16px; margin: 24px 0 4px 0; font-weight:normal; color:rgba(0,0,0,.64);">{{$price}}$</strong>
                                         </p>
 
-                                        <a href="login.html"
+                                        <a href={{$source}}
                                             style="background: linear-gradient(156deg, #ff56bb 0%, #ff8f77 100%);text-decoration:none !important; display:inline-block; font-weight:500; margin-top:24px; color:#fff;text-transform:uppercase; font-size:14px;padding:10px 24px;display:inline-block;border-radius:50px;">Click to open source</a>
                                     </td>
                                 </tr>

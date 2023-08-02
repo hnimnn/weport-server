@@ -27,7 +27,8 @@ class StoreProjectRequest extends FormRequest
             'user_id' =>  ['required'],
             'description' => 'nullable',
             'tags' => 'nullable',
-            'price' => ['required'],
+            'price' => ['required', 'min:0'],
+            'source' => ['required'],
             'status' => 'nullable'
 
         ];

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\api\v1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreUserRequest;
 use App\Models\User;
 
 use Illuminate\Http\Request;
@@ -17,7 +18,7 @@ class AuthController extends Controller
     {
         $this->middleware('auth:api', ['except' => ['login', 'register']]);
     }
-    public function register(Request $request)
+    public function register(StoreUserRequest $request)
     {
         try {
             $user = new User();

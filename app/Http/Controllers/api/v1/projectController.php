@@ -25,7 +25,7 @@ class ProjectController extends Controller
             $projects = Project::all();
             $projectsFinal = array();
             foreach ($projects as $project) {
-                $projectsFinal = $project::with(['user'])->with(['users_liked'])->with('users_saved')->where('status', 'published')->get();
+                $projectsFinal = $project::select('id', 'name', 'description', 'user_id','thumbnail', 'view', 'tags', 'user_bought', 'price', 'status', 'created_at', 'updated_at')->with(['user'])->with(['users_liked'])->with('users_saved')->where('status', 'published')->get();
             }
 
             return $projectsFinal;
@@ -38,7 +38,7 @@ class ProjectController extends Controller
     public function show($id)
     {
         try {
-            return Project::where('id', $id)->with('users_liked')->with('users_saved')->first();
+            return Project::select('id', 'name', 'description', 'user_id','thumbnail', 'view', 'tags', 'user_bought', 'price', 'status', 'created_at', 'updated_at')->where('id', $id)->with('users_liked')->with('users_saved')->first();
         } catch (\Throwable $th) {
             dd($th);
         }
@@ -55,6 +55,14 @@ class ProjectController extends Controller
             $project->thumbnail = $fileURL;
             $project->save();
             return response()->json("Project Created");
+        } catch (\Throwable $th) {
+            dd($th);
+        }
+    }
+     public function dataUpdateProject($id)
+    {
+        try {
+            return Project::where('id', $id)->with('users_liked')->with('users_saved')->first();
         } catch (\Throwable $th) {
             dd($th);
         }
@@ -138,6 +146,28 @@ class ProjectController extends Controller
         }
     }
 
+    public function savedProject()
+    {
+
+        try {
+            $currentUser = Auth::user();
+            $user = User::with('users_saved')->where('id', $currentUser->id)->first();
+            $projectsFinal = array();
+            foreach ($user->users_saved as $project) {
+                $projectData = Project::with(['user', 'users_liked', 'users_saved'])
+                    ->where('id', $project->id)
+                    ->where('status', 'published')
+                    ->first();
+
+                if ($projectData) {
+                    $projectsFinal[] = $projectData; // Add the project data to the projectsFinal array
+                }
+            }
+            return $projectsFinal;
+        } catch (\Throwable $th) {
+            dd($th);
+        }
+    }
     public function buy($id)
     {
         try {
@@ -157,6 +187,9 @@ class ProjectController extends Controller
                         'name' => $userBuy->name,
                         'email' => $userBuy->email,
                         'project_name' => $project->name,
+                        'price' => $project->price,
+                        'source' => $project->source,
+
                     );
                     Mail::send(['html' => 'mail'], $data, function ($message) use ($userBuy) {
                         $message->to($userBuy->email, $userBuy->name)->subject('Here your source');

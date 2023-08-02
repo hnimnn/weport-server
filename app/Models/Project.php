@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 class Project extends Model
 {
     use HasFactory;
-    protected $fillable = ['name', 'thumbnail', 'description', 'user_id', 'tags', 'price','status'];
+    protected $fillable = ['name', 'thumbnail', 'description', 'user_id', 'tags', 'price','status', 'source'];
 
     public function users_liked()
     {
