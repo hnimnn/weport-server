@@ -62,14 +62,14 @@ class ProjectController extends Controller
      public function dataUpdateProject($id)
     {
         try {
-            return Project::where('id', $id)->with('users_liked')->with('users_saved')->first();
+            return Project::where('id', $id)->with(['user'])->with('users_liked')->with('users_saved')->first();
         } catch (\Throwable $th) {
             dd($th);
         }
     }
     public function update(StoreProjectRequest $request, Project $project)
     {
-        if ($request->thumbnail) {
+        if ($request->hasFile('thumbnail')) {
             $fileURL = Cloudinary::upload($request->file('thumbnail')->getRealPath())->getSecurePath();
             $urlParts = explode("/", $project->thumbnail);
             $imageNameWithExtension = end($urlParts);
@@ -85,7 +85,8 @@ class ProjectController extends Controller
             $request->request->add(['thumbnail' => $fileURL]);
             $project->thumbnail = $fileURL;
             $project->save();
-        }
+        } else $project->update($request->validated());
+
 
         return $project;
     }

@@ -12,6 +12,10 @@ Route::group([
 
 ], function ($router) {
     //----Auth
+    Route::get(
+        '/v1/refresh',
+        [AuthController::class, 'refresh']
+    );
     Route::post(
         '/v1/register',
         [AuthController::class, 'register']
@@ -33,7 +37,10 @@ Route::group([
         '/v1/user/{id}/profile',
         [UserController::class, 'profile']
     );
-
+    Route::post(
+        '/v1/user/update',
+        [UserController::class, 'update']
+    );
     //----Project
     Route::group(['prefix' => 'v1'], function () {
         Route::apiResource('projects', ProjectController::class);
